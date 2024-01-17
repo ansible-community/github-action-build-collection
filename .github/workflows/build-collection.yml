@@ -1,0 +1,97 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Build an Ansible collection and upload as a GitHub artifact
+'on':
+  workflow_call:
+    inputs:
+      python-version:
+        description: >-
+          The Python version to use.
+        type: string
+        default: '3.12'
+      ansible-core-version:
+        description: >-
+          The branch of tag name of ansible-core to install.
+        type: string
+        default: 'stable-2.16'
+      subdirectory:
+        description: >-
+          The subdirectory inside the collection's repo which contains the collection's root (`galaxy.yml` file).
+        type: string
+        default: .
+      artifact-name:
+        description: >-
+          The name of the GitHub artifact to upload.
+        type: string
+        default: collection-build-${{ github.sha }}
+    outputs:
+      collection-full-name:
+        description: >-
+          The collection's full name (namespace.name).
+        value: ${{ jobs.build-collection.outputs.collection-full-name }}
+      collection-name:
+        description: >-
+          The collection's name. For example `ansible.posix`'s name is `posix`.
+        value: ${{ jobs.build-collection.outputs.collection-name }}
+      collection-namespace:
+        description: >-
+          The collection's namespace. For example `ansible.posix`'s namespace is `ansible`.
+        value: ${{ jobs.build-collection.outputs.collection-namespace }}
+      collection-version:
+        description: >-
+          The collection's version. Will be set to 0.0.1 if no `version` field is present in `galaxy.yml`.
+        value: ${{ jobs.build-collection.outputs.collection-version }}
+      artifact-filename:
+        description: >-
+          Filename of the built collection artifact.
+        value: ${{ jobs.build-collection.outputs.artifact-filename }}
+      artifact-name:
+        description: >-
+          Value of the `artifact-name` input.
+        value: ${{ inputs.artifact-name }}
+
+jobs:
+  build-collection:
+    name: Build collection artifact
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      collection-full-name: ${{ steps.build-collection.outputs.collection-full-name }}
+      collection-name: ${{ steps.build-collection.outputs.collection-name }}
+      collection-namespace: ${{ steps.build-collection.outputs.collection-namespace }}
+      collection-version: ${{ steps.build-collection.outputs.collection-version }}
+      artifact-filename: ${{ steps.build-collection.outputs.artifact-filename }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          path: ./checkout
+
+      - name: Build collection artifact
+        uses: ansible-community/github-action-build-collection@main
+        id: build-collection
+        with:
+          python-version: ${{ inputs.python-version }}
+          ansible-core-version: ${{ inputs.ansible-core-version }}
+          subdirectory: checkout/${{ inputs.subdirectory }}
+          collection-requirements-path: requirements.yml
+
+      - name: Copy artifact and requirements.yml into subdirectory
+        shell: bash
+        env:
+          ARTIFACT_PATH: ${{ steps.build-collection.outputs.artifact-path }}
+        run: |
+          set -e
+          mkdir artifact
+          mv "${ARTIFACT_PATH}" artifact/
+          mv requirements.yml artifact/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./artifact/

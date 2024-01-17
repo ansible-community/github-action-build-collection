@@ -1,0 +1,113 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Build an Ansible collection
+description: >
+  This action builds an Ansible collection. The resulting artifact (tarball) can be used in other steps or uploaded as a GitHub artifact.
+author: "Felix Fontein (@felixfontein)"
+inputs:
+  python-version:
+    description: >-
+      The Python version to use.
+    default: '3.12'
+  ansible-core-version:
+    description: >-
+      The branch of tag name of ansible-core to install.
+    default: 'stable-2.16'
+  subdirectory:
+    description: >-
+      The subdirectory in which the collection's sources can be found. Must contain the `galaxy.yml` file.
+    default: .
+  collection-requirements-path:
+    description: >-
+      If provided, the collection's requirements will be written as a Galaxy requirements.yml file to this path.
+outputs:
+  collection-full-name:
+    description: >-
+      The collection's full name (namespace.name).
+    value: ${{ steps.collection-metadata.outputs.namespace }}.${{ steps.collection-metadata.outputs.name }}
+  collection-name:
+    description: >-
+      The collection's name. For example `ansible.posix`'s name is `posix`.
+    value: ${{ steps.collection-metadata.outputs.name }}
+  collection-namespace:
+    description: >-
+      The collection's namespace. For example `ansible.posix`'s namespace is `ansible`.
+    value: ${{ steps.collection-metadata.outputs.namespace }}
+  collection-version:
+    description: >-
+      The collection's version. Will be set to 0.0.1 if no `version` field is present in `galaxy.yml`.
+    value: ${{ steps.collection-metadata.outputs.version }}
+  artifact-filename:
+    description: >-
+      Filename of the built collection artifact.
+    value: ${{ steps.collection-metadata.outputs.filename }}
+  artifact-path:
+    description: >-
+      Path to the built collection artifact.
+    value: ${{ steps.collection-metadata.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install ansible-core
+      shell: bash
+      env:
+        ANSIBLE_CORE_VERSION: ${{ inputs.ansible-core-version }}
+      run: pip install "https://github.com/ansible/ansible/archive/${ANSIBLE_CORE_VERSION}.tar.gz" --disable-pip-version-check
+
+    - name: Make sure galaxy.yml has version entry, and extract information
+      shell: python
+      id: collection-metadata
+      env:
+        SUBDIRECTORY: ${{ inputs.subdirectory }}
+        COLLECTION_REQUIREMENTS_PATH: ${{ inputs.collection-requirements-path }}
+      run: |
+        import os
+        import yaml
+
+        def set_output(name, value):
+            with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as f:
+                f.write(f'{name}={value}{os.linesep}')
+
+        # Make sure galaxy.yml contains a version
+        galaxy_filename = os.path.join(os.environ['SUBDIRECTORY'], 'galaxy.yml')
+        with open(galaxy_filename, 'rb') as f:
+            data = yaml.safe_load(f) ;
+        data['version'] = data.get('version') or '0.0.1'
+        with open(galaxy_filename, 'w', encoding='utf-8') as f:
+            f.write(yaml.dump(data))
+
+        # Create Galaxy requirements file
+        requirements_filename = os.environ['COLLECTION_REQUIREMENTS_PATH']
+        if requirements_filename:
+            reqs = dict(collections=[])
+            if data.get('dependencies'):
+                for collection, version in sorted(data['dependencies'].items()):
+                    reqs['collections'].append(dict(
+                        name=collection,
+                        source='https://galaxy.ansible.com',
+                        version=version,
+                    ))
+            with open(requirements_filename, 'w', encoding='utf-8') as f:
+                f.write(yaml.dump(reqs))
+
+        # Extract namespace and collection name
+        set_output('name', data['name'])
+        set_output('namespace', data['namespace'])
+        set_output('version', data['version'])
+        artifact_filename = f"{data['namespace']}-{data['name']}-{data['version']}.tar.gz"
+        set_output('filename', artifact_filename)
+        set_output('path', os.path.join(os.environ['SUBDIRECTORY'], artifact_filename))
+
+    - name: Build collection
+      shell: bash
+      run: ansible-galaxy collection build
+      working-directory: ${{ inputs.subdirectory }}
