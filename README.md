@@ -89,7 +89,7 @@ Path to the built collection artifact.
 
 ## Bundled shared workflow
 
-This GitHub Action bundles a shared workflow, [build-collection.yaml](https://github.com/ansible-community/github-action-build-collection/blob/main/.github/workflows/build-collection.yml), which allows you to build a collection, and upload the built collection artifact together with its `requirements.yml` file as a GitHub artifact.
+This GitHub Action bundles a shared workflow, [build-collection.yml](https://github.com/ansible-community/github-action-build-collection/blob/main/.github/workflows/build-collection.yml), which allows you to build a collection, and upload the built collection artifact together with its `requirements.yml` file as a GitHub artifact.
 
 ```yaml
 jobs:
