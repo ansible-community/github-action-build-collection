@@ -71,6 +71,8 @@ runs:
         SUBDIRECTORY: ${{ inputs.subdirectory }}
         COLLECTION_REQUIREMENTS_PATH: ${{ inputs.collection-requirements-path }}
       run: |
+        # Make sure galaxy.yml has version entry, and extract information
+
         import os
         import yaml
 
