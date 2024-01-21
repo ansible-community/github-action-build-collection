@@ -7,6 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 # GitHub Action for building Ansible collections
 
 [![Linting](https://github.com/ansible-community/github-action-build-collection/actions/workflows/linting.yml/badge.svg)](https://github.com/ansible-community/github-action-build-collection/actions/workflows/linting.yml)
+[![Tests](https://github.com/ansible-community/github-action-build-collection/actions/workflows/tests.yml/badge.svg)](https://github.com/ansible-community/github-action-build-collection/actions/workflows/tests.yml)
 [![REUSE](https://github.com/ansible-community/github-action-build-collection/actions/workflows/reuse.yml/badge.svg)](https://github.com/ansible-community/github-action-build-collection/actions/workflows/reuse.yml)
 
 A composite GitHub Action that allows to build an Ansible collection artifact in GitHub Actions CI/CD workflows.

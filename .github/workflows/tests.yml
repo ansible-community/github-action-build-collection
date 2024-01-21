@@ -1,0 +1,50 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Action testing
+
+'on':
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Run once per week (Friday at 07:00 UTC)
+  schedule:
+    - cron: '0 7 * * 5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run action
+        id: action
+        uses: ./
+        with:
+          subdirectory: tests/foo.bar
+
+      - name: Validate results
+        env:
+          OUT_COLLECTION_FULL_NAME: ${{ steps.action.outputs.collection-full-name }}
+          OUT_COLLECTION_NAME: ${{ steps.action.outputs.collection-name }}
+          OUT_COLLECTION_NAMESPACE: ${{ steps.action.outputs.collection-namespace }}
+          OUT_COLLECTION_VERSION: ${{ steps.action.outputs.collection-version }}
+          OUT_ARTIFACT_FILENAME: ${{ steps.action.outputs.artifact-filename }}
+          OUT_ARTIFACT_PATH: ${{ steps.action.outputs.artifact-path }}
+        shell: python
+        run: |
+          # Validate results
+
+          import os
+
+          assert os.environ['OUT_COLLECTION_FULL_NAME'] == 'foo.bar'
+          assert os.environ['OUT_COLLECTION_NAME'] == 'bar'
+          assert os.environ['OUT_COLLECTION_NAMESPACE'] == 'foo'
+          assert os.environ['OUT_COLLECTION_VERSION'] == '1.2.3'
+          assert os.environ['OUT_ARTIFACT_FILENAME'] == 'foo-bar-1.2.3.tar.gz'
+          assert os.path.isfile(os.environ['OUT_ARTIFACT_PATH'])
