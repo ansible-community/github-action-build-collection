@@ -10,11 +10,12 @@ author: "Felix Fontein (@felixfontein)"
 inputs:
   python-version:
     description: >-
-      The Python version to use.
+      The Python version to use for running ansible-core.
     default: '3.12'
   ansible-core-version:
     description: >-
       The branch of tag name of ansible-core to install.
+      This is assumed to exist in https://github.com/ansible/ansible.
     default: 'stable-2.16'
   subdirectory:
     description: >-
@@ -22,7 +23,7 @@ inputs:
     default: .
   collection-requirements-path:
     description: >-
-      If provided, the collection's requirements will be written as a Galaxy requirements.yml file to this path.
+      If provided, the collection's requirements will be written as a Galaxy `requirements.yml` file to this path.
 outputs:
   collection-full-name:
     description: >-
@@ -38,7 +39,7 @@ outputs:
     value: ${{ steps.collection-metadata.outputs.namespace }}
   collection-version:
     description: >-
-      The collection's version. Will be set to 0.0.1 if no `version` field is present in `galaxy.yml`.
+      The collection's version. Will be set to `0.0.1` if no `version` field is present in `galaxy.yml`.
     value: ${{ steps.collection-metadata.outputs.version }}
   artifact-filename:
     description: >-
