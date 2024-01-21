@@ -11,6 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 A composite GitHub Action that allows to build an Ansible collection artifact in GitHub Actions CI/CD workflows.
 
+This action is covered by the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
 
 ## Usage
 
@@ -100,3 +101,11 @@ jobs:
 ```
 
 Please check out the workflow for the options it supports, and for which outputs it provides.
+
+## License
+
+This action is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
+
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-community/github-action-build-collection/blob/main/COPYING) for the full text.
+
+All files have a machine readable `SDPX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. This conforms to the [REUSE specification](https://reuse.software/spec/).
