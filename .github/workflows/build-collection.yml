@@ -70,6 +70,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: ./checkout
+          persist-credentials: false
 
       - name: Build collection artifact
         uses: ansible-community/github-action-build-collection@main
