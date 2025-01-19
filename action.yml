@@ -11,12 +11,12 @@ inputs:
   python-version:
     description: >-
       The Python version to use for running ansible-core.
-    default: '3.12'
+    default: '3.13'
   ansible-core-version:
     description: >-
       The branch of tag name of ansible-core to install.
       This is assumed to exist in https://github.com/ansible/ansible.
-    default: 'stable-2.16'
+    default: 'stable-2.18'
   subdirectory:
     description: >-
       The subdirectory in which the collection's sources can be found. Must contain the `galaxy.yml` file.
