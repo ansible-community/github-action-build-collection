@@ -67,7 +67,7 @@ jobs:
       artifact-filename: ${{ steps.build-collection.outputs.artifact-filename }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: ./checkout
           persist-credentials: false
