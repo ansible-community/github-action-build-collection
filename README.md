@@ -20,14 +20,14 @@ To use the action, add the following step to your workflow file (for example `.g
 
 ```yaml
 - name: Check out your collection repository
-  uses: actions/checkout@v4
+  uses: actions/checkout@v7
 
 - name: Build collection
   id: build-collection
   uses: ansible-community/github-action-build-collection@main
 
 - name: Upload built collection as artifact
-  uses: actions/upload-artifact@v4
+  uses: actions/upload-artifact@v7
   with:
     name: my-collection
     path: ${{ steps.build-collection.outputs.artifact-filename }}
