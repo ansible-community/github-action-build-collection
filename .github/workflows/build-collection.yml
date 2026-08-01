@@ -73,7 +73,7 @@ jobs:
           persist-credentials: false
 
       - name: Build collection artifact
-        uses: ansible-community/github-action-build-collection@main
+        uses: $/
         id: build-collection
         with:
           python-version: ${{ inputs.python-version }}
