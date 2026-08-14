@@ -10,6 +10,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 [![Tests](https://github.com/ansible-community/github-action-build-collection/actions/workflows/tests.yml/badge.svg)](https://github.com/ansible-community/github-action-build-collection/actions/workflows/tests.yml)
 [![REUSE](https://github.com/ansible-community/github-action-build-collection/actions/workflows/reuse.yml/badge.svg)](https://github.com/ansible-community/github-action-build-collection/actions/workflows/reuse.yml)
 
+> [!WARNING]
+> This GitHub Action is about to be deprecated and archived.
+
 A composite GitHub Action that allows to build an Ansible collection artifact in GitHub Actions CI/CD workflows.
 
 This action is covered by the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
